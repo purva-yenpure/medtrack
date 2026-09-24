@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Medical History - MedTrack{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+  <div>
+    <h1 style="font-size: 1.85rem; font-weight: 800; color: var(--slate-900);">Patient Medical Record</h1>
+    <p style="color: var(--slate-500); font-size: 0.95rem;">
+      Comprehensive clinical timeline for <strong>{{ patient.Name }}</strong> (ID: <code>{{ patient.PatientID }}</code>)
+    </p>
+  </div>
+  <div>
+    {% if session.get('role') == 'Doctor' %}
+      <a href="{{ url_for('submit_diagnosis') }}" class="btn btn-primary">
+        + Add Diagnosis
+      </a>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Patient Summary Card -->
+<div class="card" style="background: white; border-top: 4px solid var(--primary);">
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem;">
+    <div>
+      <span style="font-size: 0.8rem; color: var(--slate-500); text-transform: uppercase; font-weight: 600;">Patient Name</span>
+      <div style="font-size: 1.1rem; font-weight: 700; color: var(--slate-900);">{{ patient.Name }}</div>
+    </div>
+    <div>
+      <span style="font-size: 0.8rem; color: var(--slate-500); text-transform: uppercase; font-weight: 600;">Age</span>
+      <div style="font-size: 1.1rem; font-weight: 700; color: var(--slate-900);">{{ patient.Age }} Years</div>
+    </div>
+    <div>
+      <span style="font-size: 0.8rem; color: var(--slate-500); text-transform: uppercase; font-weight: 600;">Contact Phone</span>
+      <div style="font-size: 1.1rem; font-weight: 700; color: var(--slate-900);">{{ patient.Phone or 'N/A' }}</div>
+    </div>
+    <div>
+      <span style="font-size: 0.8rem; color: var(--slate-500); text-transform: uppercase; font-weight: 600;">Email Address</span>
+      <div style="font-size: 1.1rem; font-weight: 700; color: var(--slate-900);">{{ patient.Email or 'N/A' }}</div>
+    </div>
+  </div>
+
+  <div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--slate-100);">
+    <span style="font-size: 0.8rem; color: var(--slate-500); text-transform: uppercase; font-weight: 600;">Recorded Medical Background / Pre-existing Conditions</span>
+    <p style="font-size: 0.95rem; color: var(--slate-700); margin-top: 0.35rem; background: var(--slate-50); padding: 0.75rem 1rem; border-radius: var(--radius);">
+      {{ patient.MedicalHistory or 'No prior chronic conditions recorded.' }}
+    </p>
+  </div>
+</div>
+
+<!-- Diagnosis Timeline -->
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">Diagnosis & Treatment Reports Timeline</h3>
+    <span style="font-size: 0.85rem; color: var(--slate-500);">Total: {{ diagnoses|length }} entries</span>
+  </div>
+
+  {% if diagnoses %}
+    <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+      {% for d in diagnoses %}
+        <div style="border: 1px solid var(--slate-200); border-radius: var(--radius); padding: 1.25rem; background: #ffffff;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+            <div>
+              <div style="font-size: 1rem; font-weight: 700; color: var(--slate-900);">
+                Report by {{ d.DoctorName }}
+              </div>
+              <div style="font-size: 0.85rem; color: var(--slate-500);">
+                {{ d.DoctorSpecialization }} &bull; Diagnosis ID: <code>{{ d.DiagnosisID }}</code> &bull; Ref Appointment: <code>{{ d.AppointmentID }}</code>
+              </div>
+            </div>
+            <span class="badge" style="background: #e0f2fe; color: #0369a1;">
+              {{ d.Date }}
+            </span>
+          </div>
+
+          <div style="background: var(--slate-50); padding: 1rem; border-radius: var(--radius); font-size: 0.95rem; color: var(--slate-800); line-height: 1.6;">
+            {{ d.Report }}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div style="text-align: center; padding: 2rem; color: var(--slate-500);">
+      <p>No diagnosis records on file for this patient.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

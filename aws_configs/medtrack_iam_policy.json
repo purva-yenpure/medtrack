@@ -1,0 +1,48 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "MedTrackDynamoDBPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:PutItem",
+        "dynamodb:GetItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:Query",
+        "dynamodb:Scan",
+        "dynamodb:DescribeTable"
+      ],
+      "Resource": [
+        "arn:aws:dynamodb:*:*:table/MedTrack_Users",
+        "arn:aws:dynamodb:*:*:table/MedTrack_Doctors",
+        "arn:aws:dynamodb:*:*:table/MedTrack_Patients",
+        "arn:aws:dynamodb:*:*:table/MedTrack_Appointments",
+        "arn:aws:dynamodb:*:*:table/MedTrack_Diagnosis",
+        "arn:aws:dynamodb:*:*:table/MedTrack_Notifications"
+      ]
+    },
+    {
+      "Sid": "MedTrackSNSPermissions",
+      "Effect": "Allow",
+      "Action": [
+        "sns:Publish",
+        "sns:Subscribe",
+        "sns:CreateTopic",
+        "sns:GetTopicAttributes"
+      ],
+      "Resource": "arn:aws:sns:*:*:MedTrack_*"
+    },
+    {
+      "Sid": "MedTrackCloudWatchLogs",
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "logs:DescribeLogStreams"
+      ],
+      "Resource": "arn:aws:logs:*:*:*"
+    }
+  ]
+}

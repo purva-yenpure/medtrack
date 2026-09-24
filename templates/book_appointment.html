@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Book Appointment - MedTrack{% endblock %}
+
+{% block content %}
+<div style="max-width: 650px; margin: 1.5rem auto;">
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Schedule a Medical Appointment</h2>
+      <a href="{{ url_for('appointments') }}" class="btn btn-secondary btn-sm">My Appointments</a>
+    </div>
+
+    <form method="POST" action="{{ url_for('book_appointment') }}">
+      <div class="form-group">
+        <label class="form-label" for="doctor_id">Select Healthcare Specialist</label>
+        <select id="doctor_id" name="doctor_id" class="form-select" required>
+          <option value="" disabled selected>-- Choose a Doctor --</option>
+          {% for doc in doctors %}
+            <option value="{{ doc.DoctorID }}">
+              {{ doc.Name }} - {{ doc.Specialization }} ({{ doc.Experience }} exp)
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="date">Appointment Date</label>
+          <input type="date" id="date" name="date" class="form-control" required min="{{ current_year }}-01-01">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="time">Preferred Time Slot</label>
+          <select id="time" name="time" class="form-select" required>
+            <option value="09:00 AM">09:00 AM</option>
+            <option value="10:00 AM">10:00 AM</option>
+            <option value="11:30 AM" selected>11:30 AM</option>
+            <option value="02:00 PM">02:00 PM</option>
+            <option value="03:30 PM">03:30 PM</option>
+            <option value="04:45 PM">04:45 PM</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="reason">Reason for Visit / Symptoms</label>
+        <textarea id="reason" name="reason" class="form-control" rows="3" placeholder="Briefly describe your symptoms or reason for visit..." required></textarea>
+      </div>
+
+      <div style="background: #f0fdfa; border: 1px solid #99f6e4; border-radius: var(--radius); padding: 0.85rem; margin-bottom: 1.25rem; font-size: 0.85rem; color: #0f766e;">
+        <strong>Cloud Notification Guarantee:</strong> Once booked, AWS SNS will dispatch automated confirmations to both you and your assigned doctor.
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.75rem;">
+        Confirm & Book Appointment
+      </button>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Set default appointment date to tomorrow
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const yyyy = tomorrow.getFullYear();
+  const mm = String(tomorrow.getMonth() + 1).padStart(2, '0');
+  const dd = String(tomorrow.getDate()).padStart(2, '0');
+  document.getElementById('date').value = `${yyyy}-${mm}-${dd}`;
+</script>
+{% endblock %}

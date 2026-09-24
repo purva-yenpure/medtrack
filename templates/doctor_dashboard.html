@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}Doctor Dashboard - MedTrack{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+  <div>
+    <h1 style="font-size: 1.85rem; font-weight: 800; color: var(--slate-900);">Clinical Dashboard</h1>
+    <p style="color: var(--slate-500); font-size: 0.95rem;">
+      {{ current_user.Name }} &bull; {{ doctor.Specialization if doctor else 'Specialist' }} 
+      &bull; Doctor ID: <code>{{ session.get('entity_id') }}</code>
+    </p>
+  </div>
+  <div style="display: flex; gap: 0.75rem;">
+    <a href="{{ url_for('submit_diagnosis') }}" class="btn btn-primary">
+      <span>+</span> Submit Diagnosis
+    </a>
+    <a href="{{ url_for('search_appointments') }}" class="btn btn-secondary">
+      Search Patient Records
+    </a>
+  </div>
+</div>
+
+<!-- Stats Row -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon" style="background: #e0f2fe; color: #0284c7;">🩺</div>
+    <div>
+      <div class="stat-value">{{ scheduled_appointments|length }}</div>
+      <div class="stat-label">Pending Appointments</div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon" style="background: #dcfce7; color: #16a34a;">📑</div>
+    <div>
+      <div class="stat-value">{{ completed_appointments|length }}</div>
+      <div class="stat-label">Completed Consultations</div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon" style="background: #f3e8ff; color: #9333ea;">🔬</div>
+    <div>
+      <div class="stat-value">{{ recent_diagnoses|length }}</div>
+      <div class="stat-label">Reports Submitted</div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon" style="background: #fee2e2; color: #dc2626;">🔔</div>
+    <div>
+      <div class="stat-value">{{ unread_notifs_count }}</div>
+      <div class="stat-label">Clinical Notifications</div>
+    </div>
+  </div>
+</div>
+
+<!-- Scheduled Consultations Section -->
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">Pending Patient Consultations</h3>
+    <a href="{{ url_for('appointments') }}" class="btn btn-secondary btn-sm">Full Schedule</a>
+  </div>
+
+  {% if scheduled_appointments %}
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Appointment ID</th>
+            <th>Patient Name</th>
+            <th>Date & Time</th>
+            <th>Reason / Symptoms</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for apt in scheduled_appointments %}
+            <tr>
+              <td><code>{{ apt.AppointmentID }}</code></td>
+              <td>
+                <strong>{{ apt.PatientName }}</strong><br>
+                <small style="color: var(--slate-500);">Age: {{ apt.PatientAge }}</small>
+              </td>
+              <td>{{ apt.Date }} at {{ apt.Time }}</td>
+              <td>{{ apt.Reason }}</td>
+              <td>
+                <div style="display: flex; gap: 0.5rem;">
+                  <a href="{{ url_for('submit_diagnosis', appointment_id=apt.AppointmentID) }}" class="btn btn-primary btn-sm">
+                    Diagnose & Complete
+                  </a>
+                  <a href="{{ url_for('medical_history', patient_id=apt.PatientID) }}" class="btn btn-secondary btn-sm">
+                    History
+                  </a>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div style="text-align: center; padding: 2rem; color: var(--slate-500);">
+      <p>No pending consultations on schedule.</p>
+    </div>
+  {% endif %}
+</div>
+
+<!-- Recent Diagnoses Submitted by Doctor -->
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">Recently Submitted Diagnosis Reports</h3>
+  </div>
+
+  {% if recent_diagnoses %}
+    <div style="display: flex; flex-direction: column; gap: 1rem;">
+      {% for d in recent_diagnoses %}
+        <div style="border-left: 4px solid var(--secondary); padding: 0.75rem 1rem; background: var(--slate-50); border-radius: 0 var(--radius) var(--radius) 0;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+            <strong>Patient: {{ d.PatientName }} &bull; Appointment: <code>{{ d.AppointmentID }}</code></strong>
+            <span style="font-size: 0.8rem; color: var(--slate-500);">{{ d.Date }}</span>
+          </div>
+          <p style="font-size: 0.9rem; color: var(--slate-700);">{{ d.Report }}</p>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p style="color: var(--slate-500); font-size: 0.9rem;">No diagnosis reports filed yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>MedTrack — Cloud-Based Healthcare Management System</title>
+  
+  <!-- Preconnects & Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #090d16;
+      --bg-card: rgba(17, 24, 39, 0.75);
+      --bg-card-hover: rgba(24, 34, 53, 0.85);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-teal: rgba(20, 184, 166, 0.3);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-faint: #64748b;
+      --teal: #14b8a6;
+      --teal-glow: rgba(20, 184, 166, 0.4);
+      --cyan: #06b6d4;
+      --blue: #3b82f6;
+      --emerald: #10b981;
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      line-height: 1.5;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(20, 184, 166, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 85% 65%, rgba(59, 130, 246, 0.10) 0%, transparent 45%),
+        radial-gradient(circle at 50% 90%, rgba(6, 182, 212, 0.08) 0%, transparent 50%);
+      background-attachment: fixed;
+    }
+
+    /* Ambient animated grid lines */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      background-size: 40px 40px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Top Progress Hairline */
+    .scroll-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 2.5px;
+      width: 100%;
+      background: linear-gradient(90deg, var(--teal), var(--cyan), var(--blue));
+      transform: scaleX(0);
+      transform-origin: 0 50%;
+      z-index: 100;
+      transition: transform 0.1s ease-out;
+    }
+
+    /* Fixed Navigation Bar */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      background: rgba(9, 13, 22, 0.75);
+      border-bottom: 1px solid var(--border);
+      padding: 14px clamp(16px, 4vw, 48px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: #fff;
+      font-weight: 700;
+      font-size: 1.25rem;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-symbol {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--teal), var(--blue));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 1.2rem;
+      font-weight: 800;
+      box-shadow: 0 0 16px var(--teal-glow);
+    }
+
+    .brand-badge {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(20, 184, 166, 0.15);
+      color: var(--teal);
+      border: 1px solid var(--border-teal);
+      font-weight: 600;
+    }
+
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      gap: clamp(16px, 2.5vw, 32px);
+      list-style: none;
+    }
+
+    .nav-menu a:not(.btn-nav) {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+
+    .nav-menu a:not(.btn-nav):hover {
+      color: #fff;
+    }
+
+    .btn-nav {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 18px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--teal), #0f766e);
+      color: #fff;
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 600;
+      box-shadow: 0 4px 14px var(--teal-glow);
+      transition: all 0.3s var(--ease);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-nav:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(20, 184, 166, 0.6);
+    }
+
+    /* Main Container */
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 clamp(16px, 4vw, 32px);
+    }
+
+    /* Hero Section */
+    .hero {
+      padding-top: clamp(120px, 15vh, 180px);
+      padding-bottom: clamp(60px, 8vh, 100px);
+      text-align: center;
+    }
+
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 999px;
+      background: rgba(20, 184, 166, 0.1);
+      border: 1px solid var(--border-teal);
+      color: var(--teal);
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      margin-bottom: 24px;
+      backdrop-filter: blur(8px);
+    }
+
+    .hero-pill .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--teal);
+      box-shadow: 0 0 8px var(--teal);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    .hero-title {
+      font-size: clamp(38px, 6.2vw, 84px);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.035em;
+      max-width: 20ch;
+      margin: 0 auto 20px;
+    }
+
+    .hero-title .gradient-text {
+      background: linear-gradient(135deg, #ffffff 30%, var(--teal) 75%, var(--cyan) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(16px, 1.35vw, 20px);
+      color: var(--text-muted);
+      max-width: 58ch;
+      margin: 0 auto 36px;
+      font-weight: 400;
+      line-height: 1.6;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 48px;
+    }
+
+    .btn-hero-primary {
+      padding: 13px 30px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--teal), var(--cyan));
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1rem;
+      box-shadow: 0 4px 24px var(--teal-glow);
+      transition: all 0.3s var(--ease);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-hero-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(20, 184, 166, 0.7);
+    }
+
+    .btn-hero-secondary {
+      padding: 13px 26px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 1rem;
+      border: 1px solid var(--border);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s var(--ease);
+    }
+
+    .btn-hero-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    /* Live Telemetry Ticker */
+    .telemetry-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(16px, 4vw, 48px);
+      flex-wrap: wrap;
+      padding: 16px 28px;
+      background: rgba(17, 24, 39, 0.5);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      max-width: 860px;
+      margin: 0 auto;
+      backdrop-filter: blur(12px);
+    }
+
+    .telemetry-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .telemetry-item strong {
+      color: #fff;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Interactive Clinical Console Section */
+    .section {
+      padding: clamp(60px, 10vh, 110px) 0;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .section-eyebrow {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--teal);
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .section-title {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: #fff;
+    }
+
+    .section-desc {
+      color: var(--text-muted);
+      max-width: 52ch;
+      margin: 12px auto 0;
+      font-size: 1rem;
+    }
+
+    /* Interactive Role Tab Controller */
+    .tab-pills {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      background: rgba(15, 23, 42, 0.8);
+      padding: 6px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      max-width: 540px;
+      margin: 0 auto 36px;
+      backdrop-filter: blur(12px);
+    }
+
+    .tab-pill {
+      flex: 1;
+      padding: 10px 18px;
+      border-radius: 999px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s var(--ease);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .tab-pill.active {
+      background: linear-gradient(135deg, var(--teal), #0f766e);
+      color: #fff;
+      box-shadow: 0 2px 12px var(--teal-glow);
+    }
+
+    /* Dashboard Mockup Display */
+    .app-window {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      overflow: hidden;
+      transition: all 0.4s var(--ease);
+    }
+
+    .window-header {
+      background: rgba(15, 23, 42, 0.9);
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .window-dots {
+      display: flex;
+      gap: 7px;
+    }
+
+    .window-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 999px;
+    }
+    .dot-red { background: #ef4444; }
+    .dot-yellow { background: #f59e0b; }
+    .dot-green { background: #10b981; }
+
+    .window-url {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--text-faint);
+      background: rgba(0, 0, 0, 0.3);
+      padding: 4px 16px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+    }
+
+    .window-body {
+      padding: clamp(20px, 3.5vw, 36px);
+    }
+
+    /* Three Key Scenario Cards Grid */
+    .scenarios-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      margin-top: 48px;
+    }
+
+    .scenario-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 30px;
+      transition: all 0.3s var(--ease);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .scenario-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--border-teal);
+      background: var(--bg-card-hover);
+      box-shadow: 0 16px 36px -10px rgba(20, 184, 166, 0.15);
+    }
+
+    .scenario-tag {
+      display: inline-block;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 700;
+      color: var(--teal);
+      margin-bottom: 12px;
+    }
+
+    .scenario-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(20, 184, 166, 0.15);
+      border: 1px solid var(--border-teal);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+      color: var(--teal);
+    }
+
+    .scenario-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+
+    .scenario-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .scenario-features {
+      list-style: none;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+    }
+
+    .scenario-features li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .scenario-features li::before {
+      content: "✓";
+      color: var(--teal);
+      font-weight: 800;
+    }
+
+    /* Live Interactive Simulator in Hero Tab */
+    .sim-panel {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+    }
+
+    @media (max-width: 860px) {
+      .sim-panel { grid-template-columns: 1fr; }
+    }
+
+    .sim-form {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+    }
+
+    .sim-label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .sim-input, .sim-select {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: #fff;
+      font-size: 0.9rem;
+      margin-bottom: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .sim-input:focus, .sim-select:focus {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 2px var(--teal-glow);
+    }
+
+    .sim-btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--teal), var(--cyan));
+      border: none;
+      color: #fff;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .sim-btn:hover {
+      opacity: 0.9;
+    }
+
+    .sim-output {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .log-terminal {
+      background: #000;
+      border-radius: 8px;
+      padding: 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: #38bdf8;
+      max-height: 220px;
+      overflow-y: auto;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .log-line {
+      margin-bottom: 4px;
+      line-height: 1.4;
+    }
+    .log-success { color: var(--emerald); }
+    .log-warning { color: #f59e0b; }
+    .log-info { color: #38bdf8; }
+
+    /* Architecture Flow Component */
+    .arch-flow {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 36px;
+    }
+
+    .arch-node {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .arch-node:hover {
+      border-color: var(--teal);
+      transform: translateY(-2px);
+    }
+
+    .arch-node-badge {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(20, 184, 166, 0.15);
+      color: var(--teal);
+      font-weight: 600;
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+
+    .arch-node-name {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .arch-node-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Demo Credentials Bar */
+    .demo-strip {
+      background: linear-gradient(135deg, rgba(20, 184, 166, 0.1), rgba(59, 130, 246, 0.1));
+      border: 1px solid var(--border-teal);
+      border-radius: 16px;
+      padding: 24px;
+      margin-top: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .demo-creds {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .demo-item {
+      font-size: 0.85rem;
+    }
+
+    .demo-role {
+      font-weight: 700;
+      color: var(--teal);
+      text-transform: uppercase;
+      font-size: 0.7rem;
+      letter-spacing: 0.05em;
+    }
+
+    .demo-val {
+      font-family: 'JetBrains Mono', monospace;
+      color: #fff;
+      margin-top: 2px;
+    }
+
+    /* Footer */
+    .footer {
+      border-top: 1px solid var(--border);
+      padding: 40px clamp(16px, 4vw, 48px);
+      text-align: center;
+      color: var(--text-faint);
+      font-size: 0.85rem;
+      margin-top: 60px;
+    }
+
+    .footer a {
+      color: var(--teal);
+      text-decoration: none;
+    }
+
+    @media (max-width: 768px) {
+      .nav-menu a:not(.btn-nav) { display: none; }
+      .hero-title { font-size: 34px; }
+      .telemetry-bar { border-radius: 16px; flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Ambient Grid Background -->
+  <div class="bg-grid"></div>
+
+  <!-- Scroll Progress Indicator -->
+  <div class="scroll-progress" id="scrollProgress"></div>
+
+  <!-- Main Fixed Header -->
+  <header class="navbar">
+    <a href="/" class="brand">
+      <div class="brand-symbol">+</div>
+      <span>MedTrack</span>
+      <span class="brand-badge">AWS Cloud</span>
+    </a>
+
+    <nav>
+      <ul class="nav-menu">
+        <li><a href="#scenarios">System Scenarios</a></li>
+        <li><a href="#interactive">Clinical Console</a></li>
+        <li><a href="#architecture">AWS Infrastructure</a></li>
+        <li><a href="{{ url_for('health') }}" target="_blank">Health API</a></li>
+        <li><a href="{{ url_for('login') }}">Sign In</a></li>
+        <li><a href="{{ url_for('register') }}" class="btn-nav">Get Started &rarr;</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <main class="container">
+    <section class="hero">
+      <div class="hero-pill">
+        <span class="dot"></span>
+        AWS EC2 &bull; DynamoDB &bull; Amazon SNS &bull; IAM Governance
+      </div>
+
+      <h1 class="hero-title">
+        The Modern Cloud Platform for <span class="gradient-text">Connected Healthcare</span>
+      </h1>
+
+      <p class="hero-subtitle">
+        MedTrack centralizes patient-doctor interactions through instant appointment scheduling, 
+        real-time diagnosis submissions, and medical history tracking on AWS scalable infrastructure.
+      </p>
+
+      <div class="hero-actions">
+        <a href="{{ url_for('book_appointment') }}" class="btn-hero-primary">
+          <span>📅</span> Book an Appointment
+        </a>
+        <a href="{{ url_for('login') }}" class="btn-hero-secondary">
+          Provider Sign In
+        </a>
+        <a href="{{ url_for('health') }}" target="_blank" class="btn-hero-secondary" style="font-family:'JetBrains Mono', monospace; font-size:0.875rem;">
+          GET /health
+        </a>
+      </div>
+
+      <!-- Real-Time Telemetry Bar -->
+      <div class="telemetry-bar">
+        <div class="telemetry-item">
+          <span>Database:</span>
+          <strong>DynamoDB (Dual-Mode)</strong>
+        </div>
+        <div class="telemetry-item">
+          <span>Messaging:</span>
+          <strong>AWS SNS (Email/SMS)</strong>
+        </div>
+        <div class="telemetry-item">
+          <span>Security:</span>
+          <strong>IAM Role-Based Access</strong>
+        </div>
+        <div class="telemetry-item">
+          <span>Status:</span>
+          <strong style="color:var(--emerald);">● Connected (Healthy)</strong>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Clinical Console Simulation -->
+    <section class="section" id="interactive">
+      <div class="section-header">
+        <div class="section-eyebrow">Live Interactive Experience</div>
+        <h2 class="section-title">Explore MedTrack in Action</h2>
+        <p class="section-desc">
+          Test real-time appointment booking and clinical diagnosis filing directly below.
+        </p>
+      </div>
+
+      <!-- Role Tabs -->
+      <div class="tab-pills">
+        <button class="tab-pill active" onclick="switchSimTab('patient')" id="tabBtnPatient">
+          <span>🧑‍🤝‍🧑</span> Patient Experience
+        </button>
+        <button class="tab-pill" onclick="switchSimTab('doctor')" id="tabBtnDoctor">
+          <span>🩺</span> Doctor Clinical Hub
+        </button>
+        <button class="tab-pill" onclick="switchSimTab('cloud')" id="tabBtnCloud">
+          <span>☁️</span> AWS Telemetry
+        </button>
+      </div>
+
+      <!-- App Window Mockup -->
+      <div class="app-window">
+        <div class="window-header">
+          <div class="window-dots">
+            <div class="window-dot dot-red"></div>
+            <div class="window-dot dot-yellow"></div>
+            <div class="window-dot dot-green"></div>
+          </div>
+          <div class="window-url" id="windowUrl">https://medtrack.health/portal/patient</div>
+          <div style="font-size:0.75rem; color:var(--teal); font-weight:600;">ACTIVE SESSION</div>
+        </div>
+
+        <div class="window-body">
+          <!-- VIEW 1: PATIENT BOOKING SIMULATOR -->
+          <div id="simPatient" class="sim-panel">
+            <div class="sim-form">
+              <h3 style="font-size:1.1rem; font-weight:700; color:#fff; margin-bottom:16px;">
+                📅 Instant Appointment Scheduler
+              </h3>
+              
+              <label class="sim-label">Select Specialist Doctor</label>
+              <select class="sim-select" id="simDoctor">
+                <option value="Dr. Sarah Johnson, MD (Cardiology)">Dr. Sarah Johnson, MD — Cardiology (12 Yrs)</option>
+                <option value="Dr. Michael Chen, MD (Neurology)">Dr. Michael Chen, MD — Neurology (9 Yrs)</option>
+              </select>
+
+              <label class="sim-label">Preferred Date</label>
+              <input type="date" class="sim-input" id="simDate" value="2026-10-15">
+
+              <label class="sim-label">Consultation Reason / Symptoms</label>
+              <input type="text" class="sim-input" id="simReason" value="Routine cardiology checkup & blood pressure review">
+
+              <button class="sim-btn" onclick="executeMockBooking()">
+                Confirm & Dispatch to Cloud &rarr;
+              </button>
+            </div>
+
+            <div class="sim-output">
+              <div>
+                <h4 style="font-size:0.85rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:10px;">
+                  AWS Cloud Event Stream (SNS &amp; DynamoDB)
+                </h4>
+                <div class="log-terminal" id="simTerminal">
+                  <div class="log-line log-info">[MedTrack System] Initialized in AWS Dual-Mode.</div>
+                  <div class="log-line log-success">[DynamoDB] Connected to table: MedTrack_Appointments.</div>
+                  <div class="log-line log-info">[SNS] Topic: arn:aws:sns:us-east-1:MedTrack_Healthcare_Alerts ready.</div>
+                  <div class="log-line">[Waiting for appointment booking event...]</div>
+                </div>
+              </div>
+
+              <div style="margin-top:16px; padding:12px; border-radius:8px; background:rgba(20,184,166,0.1); border:1px solid var(--border-teal); font-size:0.8rem; color:var(--teal);">
+                <strong>Patient Benefit:</strong> Instant automated SMS/Email confirmation, calendar sync, and guaranteed doctor availability.
+              </div>
+            </div>
+          </div>
+
+          <!-- VIEW 2: DOCTOR CLINICAL HUB -->
+          <div id="simDoctorView" class="sim-panel" style="display:none;">
+            <div class="sim-form">
+              <h3 style="font-size:1.1rem; font-weight:700; color:#fff; margin-bottom:16px;">
+                🩺 Provider Clinical Diagnosis Submission
+              </h3>
+              
+              <label class="sim-label">Patient Queue</label>
+              <select class="sim-select" id="simPatientSelect">
+                <option>APT-1001: Johnathan Doe (38 y/o) — Cardiology Consult</option>
+                <option>APT-1002: Emily Watson (29 y/o) — Neurology Consult</option>
+              </select>
+
+              <label class="sim-label">Diagnosis Findings &amp; Clinical Notes</label>
+              <textarea class="sim-input" style="height:90px; resize:none;" id="simDiagnosisText">Echocardiogram demonstrates normal ejection fraction (62%). Blood pressure controlled at 122/80. Prescribed daily hydration and follow-up in 6 months.</textarea>
+
+              <button class="sim-btn" onclick="executeMockDiagnosis()">
+                Submit Diagnosis &amp; Notify Patient &rarr;
+              </button>
+            </div>
+
+            <div class="sim-output">
+              <div>
+                <h4 style="font-size:0.85rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:10px;">
+                  Provider Security &amp; Compliance Audit
+                </h4>
+                <div class="log-terminal" id="simDoctorTerminal">
+                  <div class="log-line log-success">[IAM RBAC] Doctor Role Verified: Dr. Sarah Johnson, MD</div>
+                  <div class="log-line log-info">[DynamoDB] Partition Key: DiagnosisID generated.</div>
+                  <div class="log-line log-info">[SNS Alert] Email payload dispatched to patient address.</div>
+                  <div class="log-line log-success">[Audit] Appointment status transitioned to COMPLETED.</div>
+                </div>
+              </div>
+
+              <div style="margin-top:16px; padding:12px; border-radius:8px; background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.3); font-size:0.8rem; color:#93c5fd;">
+                <strong>Doctor Benefit:</strong> Instant retrieval of medical histories, quick report submission, and automated record finalization.
+              </div>
+            </div>
+          </div>
+
+          <!-- VIEW 3: AWS ARCHITECTURE TELEMETRY -->
+          <div id="simCloudView" style="display:none;">
+            <div style="text-align:center; max-width:700px; margin:0 auto 24px;">
+              <h3 style="font-size:1.25rem; font-weight:700; color:#fff;">AWS Cloud Infrastructure Status</h3>
+              <p style="font-size:0.9rem; color:var(--text-muted); margin-top:6px;">
+                MedTrack runs on AWS EC2 with Amazon DynamoDB, AWS SNS, and IAM governance.
+              </p>
+            </div>
+
+            <div class="arch-flow">
+              <div class="arch-node">
+                <span class="arch-node-badge">Compute Layer</span>
+                <div class="arch-node-name">AWS EC2</div>
+                <div class="arch-node-sub">Gunicorn &bull; Nginx &bull; Flask</div>
+              </div>
+
+              <div class="arch-node">
+                <span class="arch-node-badge">NoSQL Database</span>
+                <div class="arch-node-name">Amazon DynamoDB</div>
+                <div class="arch-node-sub">6 On-Demand Scalable Tables</div>
+              </div>
+
+              <div class="arch-node">
+                <span class="arch-node-badge">Pub/Sub Notifications</span>
+                <div class="arch-node-name">AWS SNS</div>
+                <div class="arch-node-sub">Real-Time Email &amp; SMS Alerts</div>
+              </div>
+
+              <div class="arch-node">
+                <span class="arch-node-badge">Access Control</span>
+                <div class="arch-node-name">AWS IAM</div>
+                <div class="arch-node-sub">Least-Privilege Roles &amp; Policies</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Three Core Scenarios Section -->
+    <section class="section" id="scenarios">
+      <div class="section-header">
+        <div class="section-eyebrow">Key Healthcare Scenarios</div>
+        <h2 class="section-title">Engineered for Clinical Precision</h2>
+        <p class="section-desc">
+          Addressing the three primary operational challenges in modern healthcare IT.
+        </p>
+      </div>
+
+      <div class="scenarios-grid">
+        <!-- Scenario 1 -->
+        <div class="scenario-card">
+          <span class="scenario-tag">Scenario 1</span>
+          <div class="scenario-icon">📅</div>
+          <h3 class="scenario-title">Efficient Appointment Booking</h3>
+          <p class="scenario-desc">
+            Patients log in, select their specialist, and submit booking requests in real time. 
+            Hosted on AWS EC2 with Flask handling high-concurrency requests seamlessly during peak clinic hours.
+          </p>
+          <ul class="scenario-features">
+            <li>Dynamic real-time specialist matching</li>
+            <li>Zero scheduling conflicts or overlap</li>
+            <li>Sub-second database writes in DynamoDB</li>
+          </ul>
+        </div>
+
+        <!-- Scenario 2 -->
+        <div class="scenario-card">
+          <span class="scenario-tag">Scenario 2</span>
+          <div class="scenario-icon">🛡️</div>
+          <h3 class="scenario-title">Secure IAM User Management</h3>
+          <p class="scenario-desc">
+            MedTrack utilizes AWS IAM roles and least-privilege policies. Patients manage their own bookings, 
+            while doctors access clinical records and diagnostic queues under strict compliance protocols.
+          </p>
+          <ul class="scenario-features">
+            <li>Role-Based Access Control (RBAC)</li>
+            <li>Isolated doctor and patient permissions</li>
+            <li>Encrypted passwords with Werkzeug security</li>
+          </ul>
+        </div>
+
+        <!-- Scenario 3 -->
+        <div class="scenario-card">
+          <span class="scenario-tag">Scenario 3</span>
+          <div class="scenario-icon">📋</div>
+          <h3 class="scenario-title">Medical History & Diagnosis</h3>
+          <p class="scenario-desc">
+            Doctors and patients enjoy instant access to comprehensive medical records. 
+            Doctors upload diagnosis reports that update visit statuses and immediately trigger AWS SNS notifications.
+          </p>
+          <ul class="scenario-features">
+            <li>Lifelong medical timeline preservation</li>
+            <li>Instant diagnosis report submission</li>
+            <li>Multi-channel automated SNS alerts</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Demo Credentials Strip -->
+    <div class="demo-strip" id="credentials">
+      <div>
+        <h4 style="font-size:1.1rem; font-weight:700; color:#fff;">⚡ Pre-Configured Test Accounts</h4>
+        <p style="font-size:0.85rem; color:var(--text-muted); margin-top:2px;">
+          Log in directly to test all patient, doctor, and admin privileges locally:
+        </p>
+      </div>
+
+      <div class="demo-creds">
+        <div class="demo-item">
+          <div class="demo-role">Patient Portal</div>
+          <div class="demo-val">john.doe@gmail.com</div>
+          <div style="font-size:0.75rem; color:var(--text-faint);">Pass: <code>Patient@123</code></div>
+        </div>
+
+        <div class="demo-item">
+          <div class="demo-role">Doctor Portal</div>
+          <div class="demo-val">sarah.johnson@medtrack.com</div>
+          <div style="font-size:0.75rem; color:var(--text-faint);">Pass: <code>Doctor@123</code></div>
+        </div>
+
+        <div class="demo-item">
+          <div class="demo-role">Admin Console</div>
+          <div class="demo-val">admin@medtrack.com</div>
+          <div style="font-size:0.75rem; color:var(--text-faint);">Pass: <code>Admin@123</code></div>
+        </div>
+      </div>
+
+      <div>
+        <a href="{{ url_for('login') }}" class="btn-nav" style="padding:10px 22px;">
+          Go to Sign In &rarr;
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>
+      &copy; 2026 MedTrack Healthcare Management Platform &bull; Built with Flask, AWS EC2, Amazon DynamoDB, AWS SNS &amp; IAM Roles.
+    </p>
+    <p style="margin-top:6px;">
+      <a href="{{ url_for('health') }}">System Telemetry (/health)</a> &bull; 
+      <a href="{{ url_for('appointments') }}">Appointments Directory</a> &bull; 
+      <a href="{{ url_for('register') }}">Create New Account</a>
+    </p>
+  </footer>
+
+  <script>
+    // Scroll progress bar
+    window.addEventListener('scroll', () => {
+      const total = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = total > 0 ? window.pageYOffset / total : 0;
+      document.getElementById('scrollProgress').style.transform = `scaleX(${progress})`;
+    });
+
+    // Tab switcher for interactive simulator
+    function switchSimTab(tab) {
+      document.getElementById('tabBtnPatient').classList.toggle('active', tab === 'patient');
+      document.getElementById('tabBtnDoctor').classList.toggle('active', tab === 'doctor');
+      document.getElementById('tabBtnCloud').classList.toggle('active', tab === 'cloud');
+
+      document.getElementById('simPatient').style.display = tab === 'patient' ? 'grid' : 'none';
+      document.getElementById('simDoctorView').style.display = tab === 'doctor' ? 'grid' : 'none';
+      document.getElementById('simCloudView').style.display = tab === 'cloud' ? 'block' : 'none';
+
+      const urlMap = {
+        patient: 'https://medtrack.health/portal/patient',
+        doctor: 'https://medtrack.health/portal/doctor',
+        cloud: 'https://medtrack.health/aws/infrastructure'
+      };
+      document.getElementById('windowUrl').textContent = urlMap[tab];
+    }
+
+    // Mock interactive booking execution
+    function executeMockBooking() {
+      const doctor = document.getElementById('simDoctor').value;
+      const date = document.getElementById('simDate').value;
+      const reason = document.getElementById('simReason').value;
+      const aptId = 'APT-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+
+      const term = document.getElementById('simTerminal');
+      const time = new Date().toLocaleTimeString();
+
+      term.innerHTML += `
+        <div class="log-line log-warning">[${time}] Processing booking request for patient Johnathan Doe...</div>
+        <div class="log-line log-success">[${time}] DynamoDB PutItem OK: AppointmentID=${aptId}</div>
+        <div class="log-line log-info">[${time}] Assigned to: ${doctor} on ${date}</div>
+        <div class="log-line log-success">[${time}] AWS SNS Publish OK: Email alert dispatched to doctor &amp; patient!</div>
+      `;
+      term.scrollTop = term.scrollHeight;
+    }
+
+    // Mock interactive diagnosis submission
+    function executeMockDiagnosis() {
+      const term = document.getElementById('simDoctorTerminal');
+      const time = new Date().toLocaleTimeString();
+      const diagId = 'DIA-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+
+      term.innerHTML += `
+        <div class="log-line log-warning">[${time}] Submitting diagnosis report from Dr. Sarah Johnson...</div>
+        <div class="log-line log-success">[${time}] DynamoDB Table MedTrack_Diagnosis Inserted: ${diagId}</div>
+        <div class="log-line log-info">[${time}] Appointment status updated to 'Completed'.</div>
+        <div class="log-line log-success">[${time}] AWS SNS: Notification sent to patient. History timeline updated.</div>
+      `;
+      term.scrollTop = term.scrollHeight;
+    }
+  </script>
+</body>
+</html>

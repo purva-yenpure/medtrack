@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}MedTrack - Cloud Healthcare Platform{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', -apple-system, sans-serif; }
+  </style>
+</head>
+<body>
+  <!-- Header / Navigation Bar -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="{{ url_for('index') }}" class="brand">
+        <div class="brand-icon">+</div>
+        <span>MedTrack</span>
+        <span class="mode-pill {% if storage_mode == 'AWS DynamoDB' %}aws{% endif %}">
+          {{ storage_mode }}
+        </span>
+      </a>
+
+      <nav>
+        <ul class="nav-links">
+          {% if session.get('user_id') %}
+            <li><a href="{{ url_for('dashboard') }}" class="nav-link">Dashboard</a></li>
+            <li><a href="{{ url_for('appointments') }}" class="nav-link">Appointments</a></li>
+            <li><a href="{{ url_for('search_appointments') }}" class="nav-link">Search</a></li>
+            
+            {% if session.get('role') == 'Patient' %}
+              <li><a href="{{ url_for('book_appointment') }}" class="nav-link">Book Now</a></li>
+              <li><a href="{{ url_for('medical_history') }}" class="nav-link">Medical History</a></li>
+            {% elif session.get('role') == 'Doctor' %}
+              <li><a href="{{ url_for('submit_diagnosis') }}" class="nav-link">Submit Diagnosis</a></li>
+            {% endif %}
+
+            <li>
+              <a href="{{ url_for('notifications') }}" class="nav-link">
+                Alerts
+                {% if unread_notifs_count > 0 %}
+                  <span class="nav-badge">{{ unread_notifs_count }}</span>
+                {% endif %}
+              </a>
+            </li>
+            <li><a href="{{ url_for('profile') }}" class="nav-link">Profile</a></li>
+            <li><a href="{{ url_for('logout') }}" class="btn btn-secondary btn-sm">Logout</a></li>
+          {% else %}
+            <li><a href="{{ url_for('index') }}" class="nav-link">Home</a></li>
+            <li><a href="{{ url_for('login') }}" class="nav-link">Login</a></li>
+            <li><a href="{{ url_for('register') }}" class="btn btn-primary btn-sm">Get Started</a></li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Flash Notifications -->
+  <main class="main-content">
+    <div class="flash-container">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">
+              <span>{{ message }}</span>
+              <button onclick="this.parentElement.remove()" style="background:none;border:none;cursor:pointer;font-weight:bold;color:inherit;">✕</button>
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+    </div>
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>
+      &copy; {{ current_year }} MedTrack Healthcare System &bull; Designed for AWS EC2, DynamoDB, SNS & IAM Architecture &bull; 
+      <a href="{{ url_for('health') }}" target="_blank" style="color:var(--primary);text-decoration:none;font-weight:600;">System Health API</a>
+    </p>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

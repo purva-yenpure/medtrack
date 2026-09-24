@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Appointments - MedTrack{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+  <div>
+    <h1 style="font-size: 1.85rem; font-weight: 800; color: var(--slate-900);">Appointments Directory</h1>
+    <p style="color: var(--slate-500); font-size: 0.95rem;">
+      Manage and monitor healthcare visits in real-time
+    </p>
+  </div>
+  <div style="display: flex; gap: 0.75rem;">
+    {% if session.get('role') == 'Patient' %}
+      <a href="{{ url_for('book_appointment') }}" class="btn btn-primary">
+        + New Appointment
+      </a>
+    {% endif %}
+    <a href="{{ url_for('search_appointments') }}" class="btn btn-secondary">
+      Advanced Search
+    </a>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <div style="flex: 1; max-width: 320px;">
+      <input type="text" id="tableSearchInput" class="form-control" placeholder="Quick filter by doctor, date, or ID...">
+    </div>
+    <span style="font-size: 0.85rem; color: var(--slate-500);">
+      Total: {{ appointments|length }} records
+    </span>
+  </div>
+
+  {% if appointments %}
+    <div class="table-responsive">
+      <table class="table" id="appointmentsTable">
+        <thead>
+          <tr>
+            <th>ID</th>
+            {% if session.get('role') != 'Patient' %}
+              <th>Patient</th>
+            {% endif %}
+            {% if session.get('role') != 'Doctor' %}
+              <th>Doctor</th>
+            {% endif %}
+            <th>Date & Time</th>
+            <th>Reason</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for apt in appointments %}
+            <tr>
+              <td><code>{{ apt.AppointmentID }}</code></td>
+              {% if session.get('role') != 'Patient' %}
+                <td>
+                  <strong>{{ apt.PatientName }}</strong>
+                </td>
+              {% endif %}
+              {% if session.get('role') != 'Doctor' %}
+                <td>
+                  <strong>{{ apt.DoctorName }}</strong><br>
+                  <small style="color: var(--slate-500);">{{ apt.DoctorSpecialization }}</small>
+                </td>
+              {% endif %}
+              <td>{{ apt.Date }} at {{ apt.Time }}</td>
+              <td>{{ apt.Reason }}</td>
+              <td>
+                <span class="badge badge-{{ apt.Status|lower }}">{{ apt.Status }}</span>
+              </td>
+              <td>
+                <div style="display: flex; gap: 0.4rem; align-items: center;">
+                  {% if session.get('role') == 'Doctor' and apt.Status != 'Completed' %}
+                    <a href="{{ url_for('submit_diagnosis', appointment_id=apt.AppointmentID) }}" class="btn btn-primary btn-sm">
+                      Diagnose
+                    </a>
+                  {% endif %}
+
+                  {% if apt.Status == 'Scheduled' %}
+                    <form method="POST" action="{{ url_for('update_appointment_status', appointment_id=apt.AppointmentID) }}" onsubmit="return confirm('Change status to Cancelled?');" style="display:inline;">
+                      <input type="hidden" name="status" value="Cancelled">
+                      <button type="submit" class="btn btn-secondary btn-sm" style="color: var(--danger);">Cancel</button>
+                    </form>
+                  {% endif %}
+
+                  {% if session.get('role') == 'Doctor' %}
+                    <a href="{{ url_for('medical_history', patient_id=apt.PatientID) }}" class="btn btn-secondary btn-sm">
+                      History
+                    </a>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div style="text-align: center; padding: 3rem; color: var(--slate-500);">
+      <p style="font-size: 1.1rem; margin-bottom: 0.5rem;">No appointments found.</p>
+      {% if session.get('role') == 'Patient' %}
+        <a href="{{ url_for('book_appointment') }}" class="btn btn-primary">Book Now</a>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

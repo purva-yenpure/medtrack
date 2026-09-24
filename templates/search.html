@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Search Appointments - MedTrack{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <div>
+      <h2 class="card-title">Search Appointments Directory</h2>
+      <p style="font-size: 0.875rem; color: var(--slate-500); margin-top: 0.2rem;">
+        Query records by doctor, patient, date, or appointment status
+      </p>
+    </div>
+  </div>
+
+  <form method="GET" action="{{ url_for('search_appointments') }}" style="margin-bottom: 1.5rem;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: end;">
+      <div class="form-group" style="margin-bottom: 0;">
+        <label class="form-label" for="q">Keyword / Name / ID</label>
+        <input type="text" id="q" name="q" value="{{ query }}" class="form-control" placeholder="Search doctor, patient, reason...">
+      </div>
+
+      <div class="form-group" style="margin-bottom: 0;">
+        <label class="form-label" for="date">Specific Date</label>
+        <input type="date" id="date" name="date" value="{{ date_filter }}" class="form-control">
+      </div>
+
+      <div class="form-group" style="margin-bottom: 0;">
+        <label class="form-label" for="status">Appointment Status</label>
+        <select id="status" name="status" class="form-select">
+          <option value="">All Statuses</option>
+          <option value="Scheduled" {% if status_filter == 'Scheduled' %}selected{% endif %}>Scheduled</option>
+          <option value="Completed" {% if status_filter == 'Completed' %}selected{% endif %}>Completed</option>
+          <option value="Cancelled" {% if status_filter == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+        </select>
+      </div>
+
+      <div style="display: flex; gap: 0.5rem;">
+        <button type="submit" class="btn btn-primary" style="flex: 1;">Search</button>
+        <a href="{{ url_for('search_appointments') }}" class="btn btn-secondary">Reset</a>
+      </div>
+    </div>
+  </form>
+
+  <hr style="border: 0; border-top: 1px solid var(--slate-100); margin-bottom: 1.5rem;">
+
+  <div>
+    <h3 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--slate-800);">
+      Search Results ({{ results|length }})
+    </h3>
+
+    {% if results %}
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Appointment ID</th>
+              <th>Patient</th>
+              <th>Doctor</th>
+              <th>Date & Time</th>
+              <th>Reason</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for apt in results %}
+              <tr>
+                <td><code>{{ apt.AppointmentID }}</code></td>
+                <td><strong>{{ apt.PatientName }}</strong></td>
+                <td>{{ apt.DoctorName }}</td>
+                <td>{{ apt.Date }} at {{ apt.Time }}</td>
+                <td>{{ apt.Reason }}</td>
+                <td>
+                  <span class="badge badge-{{ apt.Status|lower }}">{{ apt.Status }}</span>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 2.5rem; color: var(--slate-500); background: var(--slate-50); border-radius: var(--radius);">
+        <p>No appointments matched your search criteria.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

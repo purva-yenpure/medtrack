@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}System Administration - MedTrack{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+  <div>
+    <h1 style="font-size: 1.85rem; font-weight: 800; color: var(--slate-900);">Administration Console</h1>
+    <p style="color: var(--slate-500); font-size: 0.95rem;">
+      MedTrack Architecture, Cloud Database & IAM Governance
+    </p>
+  </div>
+  <div>
+    <span class="mode-pill {% if stats.storage_mode == 'AWS DynamoDB' %}aws{% endif %}" style="font-size: 0.85rem; padding: 0.4rem 0.85rem;">
+      Active Mode: {{ stats.storage_mode }} ({{ stats.region }})
+    </span>
+  </div>
+</div>
+
+<!-- Stats Row -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon" style="background: #e0e7ff; color: #4338ca;">👥</div>
+    <div>
+      <div class="stat-value">{{ stats.total_users }}</div>
+      <div class="stat-label">Total Users</div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon" style="background: #f3e8ff; color: #7e22ce;">🩺</div>
+    <div>
+      <div class="stat-value">{{ stats.total_doctors }}</div>
+      <div class="stat-label">Doctors</div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon" style="background: #ccfbf1; color: #0f766e;">🧑‍🤝‍🧑</div>
+    <div>
+      <div class="stat-value">{{ stats.total_patients }}</div>
+      <div class="stat-label">Patients</div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon" style="background: #fef3c7; color: #b45309;">📅</div>
+    <div>
+      <div class="stat-value">{{ stats.total_appointments }}</div>
+      <div class="stat-label">Appointments</div>
+    </div>
+  </div>
+</div>
+
+<!-- System User Directory -->
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">User Directory & Login Telemetry</h3>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>User ID</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Phone</th>
+          <th>Login Count</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in all_users %}
+          <tr>
+            <td><code>{{ u.UserID }}</code></td>
+            <td><strong>{{ u.Name }}</strong></td>
+            <td>{{ u.Email }}</td>
+            <td>
+              <span class="badge badge-{{ u.Role|lower }}">{{ u.Role }}</span>
+            </td>
+            <td>{{ u.Phone }}</td>
+            <td><strong style="color: var(--primary);">{{ u.LoginCount or 0 }}</strong></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Recent Appointments Telemetry -->
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">Recent Appointments Telemetry</h3>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Patient</th>
+          <th>Doctor</th>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in recent_appointments %}
+          <tr>
+            <td><code>{{ a.AppointmentID }}</code></td>
+            <td>{{ a.PatientName }}</td>
+            <td>{{ a.DoctorName }}</td>
+            <td>{{ a.Date }}</td>
+            <td>{{ a.Time }}</td>
+            <td>
+              <span class="badge badge-{{ a.Status|lower }}">{{ a.Status }}</span>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

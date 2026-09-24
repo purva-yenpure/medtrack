@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Create Account - MedTrack{% endblock %}
+
+{% block content %}
+<div style="max-width: 560px; margin: 2rem auto;">
+  <div class="card">
+    <div style="text-align: center; margin-bottom: 1.5rem;">
+      <div class="brand-icon" style="margin: 0 auto 0.75rem; width: 44px; height: 44px; font-size: 1.4rem;">+</div>
+      <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--slate-900);">Join MedTrack</h2>
+      <p style="font-size: 0.875rem; color: var(--slate-500); margin-top: 0.25rem;">
+        Register as a patient to schedule appointments or as a healthcare provider
+      </p>
+    </div>
+
+    <form method="POST" action="{{ url_for('register') }}">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="name">Full Name</label>
+          <input type="text" id="name" name="name" class="form-control" placeholder="Jane Doe" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="email">Email Address</label>
+          <input type="email" id="email" name="email" class="form-control" placeholder="jane.doe@example.com" required>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="phone">Phone Number</label>
+          <input type="text" id="phone" name="phone" class="form-control" placeholder="+1-555-0199" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="roleSelect">Account Role</label>
+          <select id="roleSelect" name="role" class="form-select" required>
+            <option value="Patient" selected>Patient</option>
+            <option value="Doctor">Doctor / Medical Specialist</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Dynamic Patient Specific Fields -->
+      <div id="patientFields" style="background: var(--slate-50); padding: 1rem; border-radius: var(--radius); margin-bottom: 1.2rem; border: 1px solid var(--slate-200);">
+        <h4 style="font-size: 0.9rem; font-weight: 700; color: var(--slate-700); margin-bottom: 0.75rem;">Patient Details</h4>
+        <div class="form-group">
+          <label class="form-label" for="age">Age</label>
+          <input type="number" id="age" name="age" class="form-control" value="30" min="1" max="120">
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label" for="medical_history">Medical History / Known Conditions</label>
+          <textarea id="medical_history" name="medical_history" class="form-control" rows="2" placeholder="e.g. Asthma, allergies, past surgeries..."></textarea>
+        </div>
+      </div>
+
+      <!-- Dynamic Doctor Specific Fields -->
+      <div id="doctorFields" style="display: none; background: var(--slate-50); padding: 1rem; border-radius: var(--radius); margin-bottom: 1.2rem; border: 1px solid var(--slate-200);">
+        <h4 style="font-size: 0.9rem; font-weight: 700; color: var(--slate-700); margin-bottom: 0.75rem;">Doctor Credentials</h4>
+        <div class="form-group">
+          <label class="form-label" for="specialization">Medical Specialization</label>
+          <input type="text" id="specialization" name="specialization" class="form-control" placeholder="e.g. Cardiology, Pediatrics, Dermatology">
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label" for="experience">Years of Experience</label>
+          <input type="text" id="experience" name="experience" class="form-control" placeholder="e.g. 8 Years">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="confirm_password">Confirm Password</label>
+          <input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="••••••••" required>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem; padding: 0.75rem;">
+        Complete Registration
+      </button>
+    </form>
+
+    <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--slate-100); text-align: center; font-size: 0.875rem; color: var(--slate-600);">
+      Already have an account? 
+      <a href="{{ url_for('login') }}" style="color: var(--primary); font-weight: 600; text-decoration: none;">
+        Sign in here
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

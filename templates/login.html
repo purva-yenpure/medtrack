@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Sign In - MedTrack{% endblock %}
+
+{% block content %}
+<div style="max-width: 440px; margin: 2rem auto;">
+  <div class="card">
+    <div style="text-align: center; margin-bottom: 1.5rem;">
+      <div class="brand-icon" style="margin: 0 auto 0.75rem; width: 44px; height: 44px; font-size: 1.4rem;">+</div>
+      <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--slate-900);">Sign In to MedTrack</h2>
+      <p style="font-size: 0.875rem; color: var(--slate-500); margin-top: 0.25rem;">
+        Access your healthcare dashboard, appointments, and records
+      </p>
+    </div>
+
+    <form method="POST" action="{{ url_for('login') }}">
+      <div class="form-group">
+        <label class="form-label" for="email">Email Address</label>
+        <input type="email" id="email" name="email" class="form-control" placeholder="name@example.com" required autofocus>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="password">Password</label>
+        <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem; padding: 0.75rem;">
+        Sign In
+      </button>
+    </form>
+
+    <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--slate-100); text-align: center; font-size: 0.875rem; color: var(--slate-600);">
+      Don't have an account yet? 
+      <a href="{{ url_for('register') }}" style="color: var(--primary); font-weight: 600; text-decoration: none;">
+        Register here
+      </a>
+    </div>
+  </div>
+
+  <!-- Quick Demo Pills -->
+  <div style="background: white; border: 1px solid var(--slate-200); border-radius: var(--radius); padding: 0.75rem 1rem; font-size: 0.8rem; color: var(--slate-600); text-align: center;">
+    <strong>Quick Fill Demo:</strong><br>
+    <a href="#" onclick="fillDemo('john.doe@gmail.com', 'Patient@123'); return false;" style="color: var(--primary); text-decoration: none; margin: 0 0.4rem;">Patient</a> &bull;
+    <a href="#" onclick="fillDemo('sarah.johnson@medtrack.com', 'Doctor@123'); return false;" style="color: var(--primary); text-decoration: none; margin: 0 0.4rem;">Doctor</a> &bull;
+    <a href="#" onclick="fillDemo('admin@medtrack.com', 'Admin@123'); return false;" style="color: var(--primary); text-decoration: none; margin: 0 0.4rem;">Admin</a>
+  </div>
+</div>
+
+<script>
+  function fillDemo(email, pass) {
+    document.getElementById('email').value = email;
+    document.getElementById('password').value = pass;
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Submit Diagnosis - MedTrack{% endblock %}
+
+{% block content %}
+<div style="max-width: 650px; margin: 1.5rem auto;">
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Record Clinical Diagnosis Report</h2>
+      <a href="{{ url_for('appointments') }}" class="btn btn-secondary btn-sm">Appointments</a>
+    </div>
+
+    <form method="POST" action="{{ url_for('submit_diagnosis') }}">
+      <div class="form-group">
+        <label class="form-label" for="appointment_id">Select Consultation Appointment</label>
+        <select id="appointment_id" name="appointment_id" class="form-select" required>
+          <option value="" disabled {% if not preselected_apt %}selected{% endif %}>-- Select Appointment --</option>
+          {% for apt in appointments %}
+            <option value="{{ apt.AppointmentID }}" {% if preselected_apt == apt.AppointmentID %}selected{% endif %}>
+              {{ apt.AppointmentID }} - {{ apt.PatientName }} on {{ apt.Date }} ({{ apt.Reason }})
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="date">Diagnosis Examination Date</label>
+        <input type="date" id="date" name="date" class="form-control" required value="{{ current_year }}-09-24">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="report">Diagnosis Findings, Observations & Treatment Plan</label>
+        <textarea id="report" name="report" class="form-control" rows="5" placeholder="Detail clinical observations, diagnosis, prescribed treatment, and next review..." required></textarea>
+      </div>
+
+      <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: var(--radius); padding: 0.85rem; margin-bottom: 1.25rem; font-size: 0.85rem; color: #1d4ed8;">
+        <strong>Automated Clinical Workflow:</strong> Submitting this diagnosis will update the appointment status to <em>Completed</em>, persist the record in DynamoDB, and trigger real-time notifications to the patient.
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.75rem;">
+        Submit Diagnosis Report
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}
