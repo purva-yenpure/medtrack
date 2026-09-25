@@ -1,5 +1,7 @@
 # MedTrack - Cloud-Based Healthcare Management System
 
+🌐 **Live Demo**: [https://medtrack-34zi.onrender.com](https://medtrack-34zi.onrender.com)
+
 MedTrack is a modern healthcare management platform designed to streamline patient-doctor interactions. It centralizes appointment booking, clinical diagnosis submissions, medical history management, and automated notifications.
 
 The application is architected with a **Smart Hybrid Data Layer (Auto-Detection & Fallback)**:
@@ -112,7 +114,7 @@ erDiagram
 - Installed libraries: `Flask`, `boto3`, `python-dotenv`, `werkzeug`
 
 ### 2. Run the Application
-Open your terminal in `C:\Users\User\.gemini\antigravity\scratch\medtrack` and start the server:
+Open your terminal in `C:\Users\Admin\OneDrive\Desktop\MedTrack_AWS` and start the server:
 
 ```bash
 python app.py
@@ -160,7 +162,7 @@ This verifies:
 
 When your Troven Labs or AWS account access (3-hour temporary credentials) is activated:
 
-1. **Open `.env`** in `C:\Users\User\.gemini\antigravity\scratch\medtrack\.env`:
+1. **Open `.env`** in `C:\Users\Admin\OneDrive\Desktop\MedTrack_AWS\.env`:
    ```ini
    USE_AWS=true
    AWS_DEFAULT_REGION=us-east-1
