@@ -14,7 +14,6 @@ MedTrack is an enterprise-grade, cloud-enabled healthcare management platform de
 - 🚀 **AWS EC2 Live Deployment**: [http://54.84.14.155:5000](http://54.84.14.155:5000)
 - 🌐 **Cloud Mirror Demo**: [https://medtrack-34zi.onrender.com](https://medtrack-34zi.onrender.com)
 - 🎥 **Full Walkthrough & Demo Video**: [Watch on Google Drive](https://drive.google.com/file/d/1DUro2Bkzsi8s-ga1oqmsVp43VjrhQXKE/view?usp=sharing)
-- 🏥 **Health Check & Telemetry API**: [http://54.84.14.155:5000/health](http://54.84.14.155:5000/health)
 
 ---
 
