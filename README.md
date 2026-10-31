@@ -217,7 +217,6 @@ python app.py
 ```
 Access the application at:
 - **Web Interface**: [http://127.0.0.1:5000](http://127.0.0.1:5000)
-- **Health Telemetry**: [http://127.0.0.1:5000/health](http://127.0.0.1:5000/health)
 
 ---
 
